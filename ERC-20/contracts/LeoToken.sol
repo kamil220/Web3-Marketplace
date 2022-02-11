@@ -32,8 +32,12 @@ contract LeoToken {
         _;
     }
 
-    modifier hasEnoughAmount( address _sender, uint256 _value ) {
-        require( balanceOf[ _sender ] >= _value, 'Not enough tokens' );
+    modifier hasEnoughAmount( address _sender, uint256 _amount ) {
+        if( vestingDate[ _sender ] > block.timestamp && balanceOf[ _sender ] >= _amount ) {
+            require( _amount >= balanceOf[ _sender ] - vestingAmount[ _sender ], 'Tokens are vested' );
+        } else {
+            require( _amount >= balanceOf[ _sender ], 'Not enough tokens' );
+        }
         _;
     }
 
@@ -44,17 +48,6 @@ contract LeoToken {
 
     modifier canBuy( address _customer, uint256 __amount ) {
         require( vestingDate[ _customer ] <= block.timestamp, 'Not allowed to buy tokens more than once a week' );
-        _;
-    }
-
-    modifier canSell( address _seller, uint256 _amount ){
-
-        if( vestingDate[ _seller ] > block.timestamp && balanceOf[ _seller ] >= _amount ) {
-            require( _amount >= balanceOf[ _seller ] - vestingAmount[ _seller ], 'Tokens are vested' );
-        } else {
-            require( _amount >= balanceOf[ _seller ], 'Not enough tokens' );
-        }
-
         _;
     }
 
@@ -99,7 +92,34 @@ contract LeoToken {
         balanceOf[ msq.sender ] += _amount;
         balanceOf[ address( this ) ] -= _amount;
 
+        _addVesting( msq.sender, _amount, block.timestamp );
+
         return _amount;
+    }
+
+    function accountBalance()
+    public
+    returns ( uint256 ) {
+        return balanceOf[ msq.sender ];
+    }
+
+    function vestingAmount()
+    public
+    returns ( uint256 ) {
+
+        if( vestingDate[ msg.sender ] > block.timestamp ) {
+            return vestingAmount[ msq.sender ];
+        } else {
+            return 0;
+        }
+    }
+
+    function _addVesting( address _customer, uint256 _amount, uint256 _date )
+    private
+    {
+        _date += releasePeriod;
+        vestingDate[ _customer ] = _date;
+        vestingAmount[ _customer ] = _amount;
     }
 
     /* Start Events */
