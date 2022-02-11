@@ -9,10 +9,18 @@ contract LeoToken {
     address public owner;
 
     uint32 public releasePeriod = 7 days;
+    uint8 public tokenRate = 100;
 
     mapping( address => uint256 ) public balanceOf;
     mapping( address => mapping( address => uint256 ) ) public allowance;
-    mapping( address => mapping( uint256 => uint256 ) ) public vesting;
+
+    /*
+    * @dev We have used two mappings instead of a struct because of the gas price.
+    * You can read more at https://ethereum.stackexchange.com/questions/41466/struct-array-or-mappings/64912#64912
+    */
+    mapping( address => uint256 ) public vestingDate;
+    mapping( address => uint256 ) public vestingAmount;
+
 
     constructor() {
         owner = msq.sender;
@@ -31,6 +39,22 @@ contract LeoToken {
 
     modifier hasEnoughAllowance( address _sender, address _receiver, uint256 _value ) {
         require( allowance[ _sender ][ _receiver ] >= _value, 'Not allowed to transfer tokens' );
+        _;
+    }
+
+    modifier canBuy( address _customer, uint256 __amount ) {
+        require( vestingDate[ _customer ] <= block.timestamp, 'Not allowed to buy tokens more than once a week' );
+        _;
+    }
+
+    modifier canSell( address _seller, uint256 _amount ){
+
+        if( vestingDate[ _seller ] > block.timestamp && balanceOf[ _seller ] >= _amount ) {
+            require( _amount >= balanceOf[ _seller ] - vestingAmount[ _seller ], 'Tokens are vested' );
+        } else {
+            require( _amount >= balanceOf[ _seller ], 'Not enough tokens' );
+        }
+
         _;
     }
 
@@ -64,6 +88,18 @@ contract LeoToken {
         balanceOf[ _to ] += _value;
         emit Transfer( _from, _to, _value );
         return true;
+    }
+
+    function buyTokens()
+    public external payable canBuy( msq.sender )
+    returns ( uint256 ) {
+
+        _amount = msq.amount * tokenRate;
+
+        balanceOf[ msq.sender ] += _amount;
+        balanceOf[ address( this ) ] -= _amount;
+
+        return _amount;
     }
 
     /* Start Events */
