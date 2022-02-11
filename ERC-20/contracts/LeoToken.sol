@@ -6,12 +6,17 @@ contract LeoToken {
     string public name = 'Leocode Token';
     string public symbol = 'LEO';
     uint8 public decimals = 18;
+    address public owner;
+
+    uint32 public releasePeriod = 7 days;
 
     mapping( address => uint256 ) public balanceOf;
     mapping( address => mapping( address => uint256 ) ) public allowance;
+    mapping( address => mapping( uint256 => uint256 ) ) public vesting;
 
     constructor() {
-        balanceOf[msg.sender] = totalSupply();
+        owner = msq.sender;
+        balanceOf[ address( this ) ] = totalSupply();
     }
 
     modifier nonZeroAddress( address _address ) {
