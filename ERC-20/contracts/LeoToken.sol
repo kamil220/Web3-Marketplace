@@ -1,5 +1,6 @@
 //SPDX-License-Identifier: Unlicensed
 pragma solidity ^0.8.0;
+import 'hardhat/console.sol';
 
 contract LeoToken {
 
@@ -23,7 +24,7 @@ contract LeoToken {
 
 
     constructor() {
-        owner = msq.sender;
+        owner = msg.sender;
         balanceOf[ address( this ) ] = totalSupply();
     }
 
@@ -32,11 +33,11 @@ contract LeoToken {
         _;
     }
 
-    modifier hasEnoughAmount( address _sender, uint256 _amount ) {
-        if( vestingDate[ _sender ] > block.timestamp && balanceOf[ _sender ] >= _amount ) {
-            require( _amount >= balanceOf[ _sender ] - vestingAmount[ _sender ], 'Tokens are vested' );
+    modifier hasEnoughAmount( address _sender, uint256 _value ) {
+        if( vestingDate[ _sender ] > block.timestamp && balanceOf[ _sender ] >= _value ) {
+            require( _value >= balanceOf[ _sender ] - vestingAmount[ _sender ], 'Tokens are vested' );
         } else {
-            require( _amount >= balanceOf[ _sender ], 'Not enough tokens' );
+            require( _value >= balanceOf[ _sender ], 'Not enough tokens' );
         }
         _;
     }
@@ -84,31 +85,30 @@ contract LeoToken {
     }
 
     function buyTokens()
-    public external payable canBuy( msq.sender )
+    external payable canBuy( msg.sender, msg.value )
     returns ( uint256 ) {
 
-        _amount = msq.amount * tokenRate;
+        uint256 _amount = msg.value * tokenRate;
 
-        balanceOf[ msq.sender ] += _amount;
+        balanceOf[ msg.sender ] += _amount;
         balanceOf[ address( this ) ] -= _amount;
 
-        _addVesting( msq.sender, _amount, block.timestamp );
+        _addVesting( msg.sender, _amount, block.timestamp );
 
         return _amount;
     }
 
     function accountBalance()
-    public
+    public view
     returns ( uint256 ) {
-        return balanceOf[ msq.sender ];
+        return balanceOf[ msg.sender ];
     }
 
-    function vestingAmount()
-    public
+    function vestingBalance()
+    public view
     returns ( uint256 ) {
-
         if( vestingDate[ msg.sender ] > block.timestamp ) {
-            return vestingAmount[ msq.sender ];
+            return vestingAmount[ msg.sender ];
         } else {
             return 0;
         }
