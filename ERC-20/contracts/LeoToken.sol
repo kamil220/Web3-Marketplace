@@ -34,11 +34,17 @@ contract LeoToken {
     }
 
     modifier hasEnoughAmount( address _sender, uint256 _value ) {
+        // solhint-disable-next-line
         if( vestingDate[ _sender ] > block.timestamp && balanceOf[ _sender ] >= _value ) {
             require(  balanceOf[ _sender ] - vestingAmount[ _sender ] >= _value, 'Tokens are vested' );
         } else {
             require( balanceOf[ _sender ] >= _value , 'Not enough tokens' );
         }
+        _;
+    }
+
+    modifier hasOwnerEnoughToWithdraw( uint256 _value ) {
+            require( balanceOf[ owner ] >= _value , 'Not enough tokens' );
         _;
     }
 
@@ -48,6 +54,7 @@ contract LeoToken {
     }
 
     modifier canBuy( address _customer, uint256 __amount ) {
+        // solhint-disable-next-line
         require( vestingDate[ _customer ] <= block.timestamp, 'Not allowed to buy tokens more than once a week' );
         _;
     }
@@ -98,6 +105,7 @@ contract LeoToken {
         balanceOf[ msg.sender ] += _amount;
         balanceOf[ address( this ) ] -= _amount;
 
+        // solhint-disable-next-line
         _addVesting( msg.sender, _amount, block.timestamp );
 
         return _amount;
@@ -112,6 +120,7 @@ contract LeoToken {
     function vestingBalance()
     public view
     returns ( uint256 ) {
+        // solhint-disable-next-line
         if( vestingDate[ msg.sender ] > block.timestamp ) {
             return vestingAmount[ msg.sender ];
         } else {
@@ -120,8 +129,13 @@ contract LeoToken {
     }
 
     function withdrawLeoTokens( uint256 _value )
-    public isOwner()
+    public isOwner() hasOwnerEnoughToWithdraw( _value )
     returns ( bool success ) {
+
+        balanceOf[ address( this ) ] -= _value;
+        balanceOf[ msq.sender ] += _value;
+
+        emit Transfer( address( this ), msq.sender, _value );
 
         return true;
     }
