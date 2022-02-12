@@ -83,7 +83,7 @@ describe("LeoToken", function () {
     it( messages.checkTransferEvent, async() => {
         const [{address: senderAddress}, {address: receiverAddress}] = await ethers.getSigners();
 
-        expect( await token.transfer( receiverAddress, 10 ) ).to.emit( token, 'Transfer' ).withArgs( senderAddress, receiverAddress, 1 );
+        expect( await token.transfer( receiverAddress, 10 ) ).to.emit( token, 'Transfer' ).withArgs( senderAddress, receiverAddress, 10 );
         expect( await token.balanceOf( senderAddress ) ).to.equal( totalAmount.sub( 10 ) );
         expect( await token.balanceOf( receiverAddress) ).to.equal( 10 );
     });

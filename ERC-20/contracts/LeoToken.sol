@@ -25,7 +25,7 @@ contract LeoToken {
 
     constructor() {
         owner = msg.sender;
-        balanceOf[ address( this ) ] = totalSupply();
+        balanceOf[ owner ] = totalSupply();
     }
 
     modifier nonZeroAddress( address _address ) {
@@ -35,9 +35,9 @@ contract LeoToken {
 
     modifier hasEnoughAmount( address _sender, uint256 _value ) {
         if( vestingDate[ _sender ] > block.timestamp && balanceOf[ _sender ] >= _value ) {
-            require( _value >= balanceOf[ _sender ] - vestingAmount[ _sender ], 'Tokens are vested' );
+            require(  balanceOf[ _sender ] - vestingAmount[ _sender ] >= _value, 'Tokens are vested' );
         } else {
-            require( _value >= balanceOf[ _sender ], 'Not enough tokens' );
+            require( balanceOf[ _sender ] >= _value , 'Not enough tokens' );
         }
         _;
     }
