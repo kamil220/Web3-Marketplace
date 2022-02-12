@@ -24,7 +24,8 @@ describe("LeoToken", function () {
         checkNotEnoughTokens: 'Throw exception when sender doesn\'t have enough tokens',
         checkBalanceAfterTransaction: 'Check account balance after transaction',
         checkTransferEvent: 'Check Transfer Event',
-        checkAllowAndSent: 'Add to allowance, and transfer'
+        checkAllowAndSent: 'Add to allowance, and transfer',
+        checkHasOwnerAllTokens: 'Check, that owner has all tokens'
     };
 
     beforeEach( async() => {
@@ -48,6 +49,14 @@ describe("LeoToken", function () {
     it( messages.checkTotalAmount, async() => {
        const total = await token.totalSupply();
        expect( total.eq( totalAmount ) ).to.equal( true )
+    });
+
+    it( messages.checkHasOwnerAllTokens, async() => {
+        const [ { address: ownerAddress } ] = await ethers.getSigners();
+        const total = await token.totalSupply();
+        const ownerBalance = await token.accountBalance();
+
+        expect( ownerBalance.eq( total ) ).to.equal( true );
     });
 
     it( messages.checkReceiverZeroAddress, async() => {

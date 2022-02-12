@@ -52,6 +52,11 @@ contract LeoToken {
         _;
     }
 
+    modifier isOwner() {
+        require( owner == msg.sender , 'Miner is not owner' );
+        _;
+    }
+
     function totalSupply() public view returns ( uint256 ) {
         return 100_000 * ( 10 ** decimals );
     }
@@ -112,6 +117,13 @@ contract LeoToken {
         } else {
             return 0;
         }
+    }
+
+    function withdrawLeoTokens( uint256 _value )
+    public isOwner()
+    returns ( bool success ) {
+
+        return true;
     }
 
     function _addVesting( address _customer, uint256 _amount, uint256 _date )
