@@ -42,6 +42,7 @@ describe("LeoToken", function () {
     });
 
     describe( 'Token details', () => {
+
         it( messages.checkName, async() => {
             expect( await token.name() ).to.equal('Leocode Token' );
         });
@@ -65,52 +66,47 @@ describe("LeoToken", function () {
 
             expect( ownerBalance.eq( total ) ).to.equal( true );
         });
+
     });
 
-    it( messages.checkReceiverZeroAddress, async() => {
-        await expect( token.transfer( zeroAddress, 10 ) ).to.be.revertedWith( messages.errorZeroAddress );
-    });
+    describe( 'Transactions', () => {
 
-    it( messages.checkSenderZeroAddress, async() => {
-        const [{address: senderAddress}] = await ethers.getSigners();
+        it( messages.checkReceiverZeroAddress, async() => {
+            await expect( token.transfer( zeroAddress, 10 ) ).to.be.revertedWith( messages.errorZeroAddress );
+        });
 
-        await expect( token.transferFrom( senderAddress, zeroAddress, 10 ) ).to.be.revertedWith( messages.errorZeroAddress );
-    });
+        it( messages.checkSenderZeroAddress, async() => {
+            await expect( token.transferFrom( owner.address, zeroAddress, 10 ) ).to.be.revertedWith( messages.errorZeroAddress );
+        });
 
-    it( messages.checkTransactionAllowance, async() => {
-        const [{address: senderAddress}, {address: receiverAddress}] = await ethers.getSigners();
+        it( messages.checkTransactionAllowance, async() => {
+            await token.transfer( owner.address, 10 );
+            await expect( token.transferFrom( owner.address, address1.address, 10 ) ).to.be.revertedWith( messages.errorNotAllowed );
+        })
 
-        await token.transfer( senderAddress, 10 );
-        await expect( token.transferFrom( senderAddress, receiverAddress, 10 ) ).to.be.revertedWith( messages.errorNotAllowed );
-    })
+        it( messages.checkNotEnoughTokens, async() => {
+            await expect( token.transfer( owner.address, totalAmount.add(10) ) ).to.be.revertedWith( messages.errorLackOfMoney );
+        });
 
-    it( messages.checkNotEnoughTokens, async() => {
-        const [{address: senderAddress}] = await ethers.getSigners();
-        await expect( token.transfer( senderAddress, totalAmount.add(10) ) ).to.be.revertedWith( messages.errorLackOfMoney );
-    });
+        it( messages.checkBalanceAfterTransaction, async() => {
+            await token.transfer( address1.address, 10 );
+            expect( await token.balanceOf( address1.address) ).to.equal( 10 );
+            expect( await token.balanceOf( owner.address ) ).to.equal( totalAmount.sub( 10 ) );
+        });
 
-    it( messages.checkBalanceAfterTransaction, async() => {
-        const [{address: senderAddress}, {address: receiverAddress}] = await ethers.getSigners();
+        it( messages.checkTransferEvent, async() => {
+            expect( await token.transfer( address1.address, 10 ) ).to.emit( token, 'Transfer' ).withArgs( owner.address, address1.address, 10 );
+            expect( await token.balanceOf( owner.address ) ).to.equal( totalAmount.sub( 10 ) );
+            expect( await token.balanceOf( address1.address) ).to.equal( 10 );
+        });
 
-        await token.transfer( receiverAddress, 10 );
-        expect( await token.balanceOf( receiverAddress) ).to.equal( 10 );
-        expect( await token.balanceOf( senderAddress ) ).to.equal( totalAmount.sub( 10 ) );
-    });
+        it( messages.checkAllowAndSent, async() => {
+            const [sender, {address: receiverAddress}] = await ethers.getSigners();
 
-    it( messages.checkTransferEvent, async() => {
-        const [{address: senderAddress}, {address: receiverAddress}] = await ethers.getSigners();
+            expect( await token.allowance( sender.address, receiverAddress ) ).to.equal( 0 );
 
-        expect( await token.transfer( receiverAddress, 10 ) ).to.emit( token, 'Transfer' ).withArgs( senderAddress, receiverAddress, 10 );
-        expect( await token.balanceOf( senderAddress ) ).to.equal( totalAmount.sub( 10 ) );
-        expect( await token.balanceOf( receiverAddress) ).to.equal( 10 );
-    });
-
-    it( messages.checkAllowAndSent, async() => {
-        const [sender, {address: receiverAddress}] = await ethers.getSigners();
-
-        expect( await token.allowance( sender.address, receiverAddress ) ).to.equal( 0 );
-
-        await expect( token.connect( sender ).approve( receiverAddress, 10 ) )
-            .to.emit( token, 'Approval' ).withArgs( sender.address, receiverAddress, 10 );
+            await expect( token.connect( sender ).approve( receiverAddress, 10 ) )
+                .to.emit( token, 'Approval' ).withArgs( sender.address, receiverAddress, 10 );
+        });
     });
 } );
