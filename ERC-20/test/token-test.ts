@@ -4,7 +4,7 @@ import {ethers} from 'hardhat';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import {describe} from "mocha";
 
-describe("LeoToken", function () {
+describe("Leocode Token", function () {
     let token: Contract;
     let owner: SignerWithAddress;
     let address1: SignerWithAddress;
@@ -20,6 +20,7 @@ describe("LeoToken", function () {
         errorZeroAddress: 'Zero address is not allowed',
         errorLackOfMoney: 'Not enough tokens',
         errorNotAllowed: 'Not allowed to transfer tokens',
+        errorMinerNotOwner: 'Miner is not owner',
         checkName: 'The name of token should be `Leocode Token`',
         checkSymbol: 'The symbol of token should be `LEO`',
         checkDecimals: 'The token should have 18 decimals',
@@ -31,7 +32,9 @@ describe("LeoToken", function () {
         checkBalanceAfterTransaction: 'Check account balance after transaction',
         checkTransferEvent: 'Check Transfer Event',
         checkAllowAndSent: 'Add to allowance, and transfer',
-        checkHasOwnerAllTokens: 'Check, that owner has all tokens'
+        checkHasOwnerAllTokens: 'Check, that owner has all tokens',
+        checkIsOwner: 'Check, that user is owner',
+        checkNormalUserWithdraw: 'An normal user cannot withdraw money'
     };
 
     beforeEach( async() => {
@@ -101,12 +104,33 @@ describe("LeoToken", function () {
         });
 
         it( messages.checkAllowAndSent, async() => {
-            const [sender, {address: receiverAddress}] = await ethers.getSigners();
+            expect( await token.allowance( owner.address, address1.address ) ).to.equal( 0 );
 
-            expect( await token.allowance( sender.address, receiverAddress ) ).to.equal( 0 );
+            await expect( token.connect( owner ).approve( address1.address, 10 ) )
+                .to.emit( token, 'Approval' ).withArgs( owner.address, address1.address, 10 );
+        });
+    });
 
-            await expect( token.connect( sender ).approve( receiverAddress, 10 ) )
-                .to.emit( token, 'Approval' ).withArgs( sender.address, receiverAddress, 10 );
+    describe( 'Marketplace', () => {
+
+        describe( 'Permission check', () => {
+
+            it( messages.checkIsOwner, async() => {
+                await expect( token.withdrawLeoTokens( 10 ) ).to.not.be.revertedWith( messages.errorMinerNotOwner );
+            });
+
+            it( messages.checkNormalUserWithdraw, async() => {
+                await expect( token.connect(address1).withdrawLeoTokens( 10 ) ).to.be.revertedWith( messages.errorMinerNotOwner );
+            });
+
+        });
+
+        describe( 'Purchase and sale', () => {
+            // lack of money
+            // moze kupic
+            // nie moze kupic bo vested
+            // nie moze sprzedać bo money vested
+            // moze sprzedać money no longer vested
         });
     });
 } );

@@ -132,10 +132,10 @@ contract LeoToken {
     public isOwner() hasOwnerEnoughToWithdraw( _value )
     returns ( bool success ) {
 
-        balanceOf[ address( this ) ] -= _value;
+        balanceOf[ owner ] -= _value;
         balanceOf[ msg.sender ] += _value;
 
-        emit Transfer( address( this ), msg.sender, _value );
+        emit Transfer( owner, msg.sender, _value );
 
         return true;
     }
