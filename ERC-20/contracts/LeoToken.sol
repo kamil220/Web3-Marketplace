@@ -111,10 +111,10 @@ contract LeoToken {
         return _amount;
     }
 
-    function accountBalance()
+    function accountBalance( address _address )
     public view
     returns ( uint256 ) {
-        return balanceOf[ msg.sender ];
+        return balanceOf[ _address ];
     }
 
     function vestingBalance()
@@ -133,9 +133,9 @@ contract LeoToken {
     returns ( bool success ) {
 
         balanceOf[ address( this ) ] -= _value;
-        balanceOf[ msq.sender ] += _value;
+        balanceOf[ msg.sender ] += _value;
 
-        emit Transfer( address( this ), msq.sender, _value );
+        emit Transfer( address( this ), msg.sender, _value );
 
         return true;
     }

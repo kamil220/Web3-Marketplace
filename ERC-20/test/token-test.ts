@@ -1,9 +1,15 @@
 import { expect } from 'chai';
 import { Contract } from 'ethers';
 import {ethers} from 'hardhat';
+import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
+import {describe} from "mocha";
 
 describe("LeoToken", function () {
     let token: Contract;
+    let owner: SignerWithAddress;
+    let address1: SignerWithAddress;
+    let address2: SignerWithAddress;
+    let address3: SignerWithAddress;
 
     const tokenCount = 100000;
     const zeroAddress = ethers.constants.AddressZero;
@@ -29,34 +35,36 @@ describe("LeoToken", function () {
     };
 
     beforeEach( async() => {
-       const Token = await ethers.getContractFactory( 'LeoToken' );
-       token = await Token.deploy();
-       await token.deployed();
+        const Token = await ethers.getContractFactory( 'LeoToken' );
+        token = await Token.deploy();
+        [ owner, address1, address2, address3 ] = await ethers.getSigners();
+        await token.deployed();
     });
 
-    it( messages.checkName, async() => {
-        expect( await token.name() ).to.equal('Leocode Token' );
-    });
+    describe( 'Token details', () => {
+        it( messages.checkName, async() => {
+            expect( await token.name() ).to.equal('Leocode Token' );
+        });
 
-    it( messages.checkSymbol, async() => {
-        expect( await token.symbol() ).to.equal( 'LEO' );
-    });
+        it( messages.checkSymbol, async() => {
+            expect( await token.symbol() ).to.equal( 'LEO' );
+        });
 
-    it( messages.checkDecimals, async() => {
-        expect( await token.decimals() ).to.equal( decimals );
-    })
+        it( messages.checkDecimals, async() => {
+            expect( await token.decimals() ).to.equal( decimals );
+        })
 
-    it( messages.checkTotalAmount, async() => {
-       const total = await token.totalSupply();
-       expect( total.eq( totalAmount ) ).to.equal( true )
-    });
+        it( messages.checkTotalAmount, async() => {
+            const total = await token.totalSupply();
+            expect( total.eq( totalAmount ) ).to.equal( true )
+        });
 
-    it( messages.checkHasOwnerAllTokens, async() => {
-        const [ { address: ownerAddress } ] = await ethers.getSigners();
-        const total = await token.totalSupply();
-        const ownerBalance = await token.accountBalance();
+        it( messages.checkHasOwnerAllTokens, async() => {
+            const total = await token.totalSupply();
+            const ownerBalance = await token.accountBalance( owner.address );
 
-        expect( ownerBalance.eq( total ) ).to.equal( true );
+            expect( ownerBalance.eq( total ) ).to.equal( true );
+        });
     });
 
     it( messages.checkReceiverZeroAddress, async() => {
