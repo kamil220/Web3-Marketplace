@@ -45,7 +45,7 @@ contract LeoToken {
     }
 
     modifier hasOwnerEnoughToWithdraw( uint256 _value ) {
-            require( balanceOf[ owner ] >= _value , 'Not enough tokens' );
+        require( balanceOf[ owner ] >= _value , 'Not enough tokens' );
         _;
     }
 
