@@ -100,24 +100,15 @@ contract LeoToken {
     }
 
     function buyTokens()
-    external payable canBuy( msg.sender, msg.value )
-    returns ( uint256 ) {
+    public payable canBuy() {
 
-        uint256 _amount = msg.value * tokenRate;
-
+        uint _amount = msg.value * tokenRate;
         balanceOf[ msg.sender ] += _amount;
         balanceOf[ address( this ) ] -= _amount;
-
         // solhint-disable-next-line
         _addVesting( msg.sender, _amount, block.timestamp );
 
-        return _amount;
-    }
-
-    function accountBalance( address _address )
-    public view
-    returns ( uint256 ) {
-        return balanceOf[ _address ];
+        emit Transfer( address( this ), msg.sender, _amount );
     }
 
     function vestingBalance()
