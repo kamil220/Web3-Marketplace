@@ -21,6 +21,7 @@ describe("Leocode Token", function () {
         errorLackOfMoney: 'Not enough tokens',
         errorNotAllowed: 'Not allowed to transfer tokens',
         errorMinerNotOwner: 'Miner is not owner',
+        errorHasVested: 'Not allowed to buy tokens more than once a week',
         checkName: 'The name of token should be `Leocode Token`',
         checkSymbol: 'The symbol of token should be `LEO`',
         checkDecimals: 'The token should have 18 decimals',
@@ -34,7 +35,8 @@ describe("Leocode Token", function () {
         checkAllowAndSent: 'Add to allowance, and transfer',
         checkHasOwnerAllTokens: 'Check, that owner has all tokens',
         checkIsOwner: 'Check, that user is owner',
-        checkNormalUserWithdraw: 'An normal user cannot withdraw money'
+        checkNormalUserWithdraw: 'An normal user cannot withdraw money',
+        checkShouldBeAbleToBuyLeoEth: 'User can buy Leo tokens via ETH'
     };
 
     beforeEach( async() => {
@@ -65,7 +67,7 @@ describe("Leocode Token", function () {
 
         it( messages.checkHasOwnerAllTokens, async() => {
             const total = await token.totalSupply();
-            const ownerBalance = await token.accountBalance( owner.address );
+            const ownerBalance = await token.balanceOf( owner.address );
 
             expect( ownerBalance.eq( total ) ).to.equal( true );
         });
@@ -126,7 +128,26 @@ describe("Leocode Token", function () {
         });
 
         describe( 'Purchase and sale', () => {
-            // lack of money
+
+            it( messages.checkNotEnoughTokens, async() => {
+                await expect(
+                    token.connect( address1 )
+                        .buyTokens(
+                            {
+                                value: ethers.utils.parseEther('0' )
+                            }))
+                    .to.be.revertedWith( messages.errorLackOfMoney );
+            });
+
+            it( messages.checkShouldBeAbleToBuyLeoEth, async() => {
+                const _amount = 5;
+                token.connect( address1 ).buyTokens( { value: ethers.utils.parseEther( _amount.toString() ) } );
+                console.log( await token.balanceOf( address1.address ) );
+            });
+
+
+
+
             // moze kupic
             // nie moze kupic bo vested
             // nie moze sprzedać bo money vested
