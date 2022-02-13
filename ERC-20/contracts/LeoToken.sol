@@ -54,10 +54,12 @@ contract LeoToken {
         _;
     }
 
-    modifier canBuy( address _customer, uint256 __amount ) {
+    modifier canBuy() {
+        require( msg.value != 0, 'Not enough tokens' );
         // solhint-disable-next-line
-        require( vestingDate[ _customer ] <= block.timestamp, 'Not allowed to buy tokens more than once a week' );
+        require( vestingDate[ msg.sender ] <= block.timestamp, 'Not allowed to buy tokens more than once a week' );
         _;
+
     }
 
     modifier isOwner() {
