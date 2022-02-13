@@ -105,6 +105,7 @@ contract LeoToken {
         uint _amount = msg.value * tokenRate;
         balanceOf[ msg.sender ] += _amount;
         balanceOf[ address( this ) ] -= _amount;
+
         // solhint-disable-next-line
         _addVesting( msg.sender, _amount, block.timestamp );
 

@@ -142,7 +142,11 @@ describe("Leocode Token", function () {
             it( messages.checkShouldBeAbleToBuyLeoEth, async() => {
                 const _amount = 5;
                 token.connect( address1 ).buyTokens( { value: ethers.utils.parseEther( _amount.toString() ) } );
-                console.log( await token.balanceOf( address1.address ) );
+                expect(await token.balanceOf(address1.address)).to.equal(
+                    ethers.BigNumber.from( _amount * 100 ).mul(
+                        ethers.BigNumber.from(10).pow(decimals)
+                    )
+                );
             });
 
 

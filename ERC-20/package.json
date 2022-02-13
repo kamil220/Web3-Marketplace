@@ -2,6 +2,7 @@
   "name": "hardhat-project",
   "license": "MIT",
   "scripts": {
+    "deploy:local": "npx hardhat run --network localhost scripts/deployToken.ts",
     "solhint": "solhint 'contracts/**/*.sol'",
     "test": "yarn run solhint && hardhat test"
   },

@@ -9,8 +9,8 @@ async function main() {
 
     console.log("Account balance:", (await deployer.getBalance()).toString());
 
-    const Token = await ethers.getContractFactory("LeoToken");
-    const token = await Token.deploy();
+    const LeoToken = await ethers.getContractFactory("LeoToken");
+    const token = await LeoToken.deploy();
 
     await token.deployed();
 
@@ -22,7 +22,7 @@ async function main() {
 function saveFrontendFiles(token: Contract) {
     const fs = require("fs");
     const path = require("path");
-    const contractsDir = path.join(__dirname, "/../frontend/src/contracts");
+    const contractsDir = path.join(__dirname, "/../../Web3-Marketplace/src/contracts");
 
     if (!fs.existsSync(contractsDir)) {
         fs.mkdirSync(contractsDir);
@@ -30,10 +30,10 @@ function saveFrontendFiles(token: Contract) {
 
     fs.writeFileSync(
         contractsDir + "/contract-addresses.json",
-        JSON.stringify({ Token: token.address }, undefined, 2)
+        JSON.stringify( {Contract : token.address}, undefined, 2)
     );
 
-    const TokenArtifact = artifacts.readArtifactSync("Token");
+    const TokenArtifact = artifacts.readArtifactSync("LeoToken");
     fs.writeFileSync(
         contractsDir + "/Token.json",
         JSON.stringify(TokenArtifact, null, 2)
