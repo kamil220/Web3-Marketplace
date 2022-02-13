@@ -6,31 +6,23 @@
           <a class="block max-w-max" href="#">
             <img class="h-8" src="src/assets/logo.svg" alt=""></a>
         </div>
-        <div class="w-1/2 xl:w-1/3">
-          <ul class="hidden xl:flex xl:justify-center">
-            <li class="mr-12">
-              <a class="text-coolGray-500 hover:text-coolGray-900 font-medium" href="#">
-                LEO Token
-              </a>
-            </li>
-            <li class="mr-12">
-              <a class="text-coolGray-500 hover:text-coolGray-900 font-medium" href="#">
-                Resources
-              </a>
-            </li>
-            <li>
-              <a class="text-coolGray-500 hover:text-coolGray-900 font-medium" href="#">
-                Pricing
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div class="w-1/2 xl:w-1/3">
-          <div class="hidden xl:flex items-center justify-end">
-            <a class="inline-block py-2 px-4 mr-2 leading-5 text-coolGray-500 hover:text-coolGray-900 bg-transparent font-medium rounded-md"
-               href="#">Log In</a>
+        <div class="w-1/2 xl:w-2/3">
+          <div class="hidden xl:flex items-center justify-end" v-if="!this.connected">
             <a class="inline-block py-2 px-4 text-sm leading-5 text-green-50 bg-green-500 hover:bg-green-600 font-medium focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 rounded-md"
-               href="#">Connect your wallet</a></div>
+               href="#" @click="this.connect" >
+              Connect your wallet
+            </a>
+          </div>
+          <div class="hidden xl:flex items-center justify-end" v-else>
+            <a class="inline-block py-2 px-4 text-sm leading-5 text-green-50 bg-green-500 hover:bg-green-600 font-medium focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 rounded-md"
+               href="#">
+              <span class="text-bold">Token ID:</span> {{ this.tokenId }}
+            </a>
+            <a class="inline-block py-2 px-4 text-sm leading-5 text-green-50 bg-yellow-600 hover:bg-green-600 font-medium focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 rounded-md ml-4"
+               href="#">
+              <span class="text-bold">Leo Amount:</span> {{ this.tokens }}
+            </a>
+          </div>
         </div>
       </div>
       <button class="navbar-burger self-center xl:hidden">
@@ -46,29 +38,10 @@
       <div class="fixed top-0 left-0 bottom-0 w-full w-4/6 max-w-xs bg-white">
         <nav class="relative p-6 h-full overflow-y-auto">
           <div class="flex flex-col justify-between h-full">
-            <a class="inline-block" href="#">
-              <img class="h-8" src="flex-ui-assets/logos/flex-ui-green-light.svg" alt=""></a>
-            <ul class="py-6">
-              <li><a
-                  class="block py-3 px-4 text-coolGray-500 hover:text-coolGray-900 font-medium hover:bg-coolGray-50 rounded-md"
-                  href="#">Product</a></li>
-              <li><a
-                  class="block py-3 px-4 text-coolGray-500 hover:text-coolGray-900 font-medium hover:bg-coolGray-50 rounded-md"
-                  href="#">Features</a></li>
-              <li><a
-                  class="block py-3 px-4 text-coolGray-500 hover:text-coolGray-900 font-medium hover:bg-coolGray-50 rounded-md"
-                  href="#">Pricing</a></li>
-              <li><a
-                  class="block py-3 px-4 text-coolGray-500 hover:text-coolGray-900 font-medium hover:bg-coolGray-50 rounded-md"
-                  href="#">Resources</a></li>
-            </ul>
             <div class="flex flex-wrap">
-              <div class="w-full mb-2"><a
-                  class="inline-block py-2 px-4 w-full text-sm leading-5 text-coolGray-500 hover:text-coolGray-900 bg-transparent font-medium text-center rounded-md"
-                  href="#">Log In</a></div>
               <div class="w-full"><a
                   class="inline-block py-2 px-4 w-full text-sm leading-5 text-white bg-green-500 hover:bg-green-600 font-medium text-center focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 rounded-md"
-                  href="#">Sign Up</a></div>
+                  href="#" @click="this.connect">Connect your wallet</a></div>
             </div>
           </div>
         </nav>
@@ -86,7 +59,17 @@
 
 <script>
 export default {
-  name: "Navbar"
+  name: "Navbar",
+  props: {
+    connected: Boolean,
+    tokenId: String,
+    tokens: Number
+  },
+  methods: {
+    connect() {
+      this.$emit('connect');
+    }
+  }
 }
 </script>
 
