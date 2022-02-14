@@ -1,4 +1,7 @@
-import { task } from "hardhat/config";
+import { HardhatUserConfig, task } from "hardhat/config";
+
+import "@typechain/hardhat";
+import "@nomiclabs/hardhat-ethers";
 import "@nomiclabs/hardhat-waffle";
 
 task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
@@ -9,6 +12,8 @@ task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
   }
 });
 
-module.exports = {
+const config: HardhatUserConfig = {
   solidity: "0.8.4",
 };
+
+export default config;
