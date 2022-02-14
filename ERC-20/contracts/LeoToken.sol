@@ -19,7 +19,7 @@ contract LeoToken {
     * @dev We have used two mappings instead of a struct because of the gas price.
     * You can read more at https://ethereum.stackexchange.com/questions/41466/struct-array-or-mappings/64912#64912
     */
-    mapping( address => uint256 ) private vestingDate;
+    mapping( address => uint256 ) public vestingDate;
     mapping( address => uint256 ) private vestingAmount;
 
 

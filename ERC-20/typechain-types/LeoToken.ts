@@ -35,6 +35,7 @@ export interface LeoTokenInterface extends utils.Interface {
     "transfer(address,uint256)": FunctionFragment;
     "transferFrom(address,address,uint256)": FunctionFragment;
     "vestingBalance()": FunctionFragment;
+    "vestingDate(address)": FunctionFragment;
     "withdrawLeoTokens(uint256)": FunctionFragment;
   };
 
@@ -73,6 +74,7 @@ export interface LeoTokenInterface extends utils.Interface {
     functionFragment: "vestingBalance",
     values?: undefined
   ): string;
+  encodeFunctionData(functionFragment: "vestingDate", values: [string]): string;
   encodeFunctionData(
     functionFragment: "withdrawLeoTokens",
     values: [BigNumberish]
@@ -102,6 +104,10 @@ export interface LeoTokenInterface extends utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "vestingBalance",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "vestingDate",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -207,6 +213,8 @@ export interface LeoToken extends BaseContract {
 
     vestingBalance(overrides?: CallOverrides): Promise<[BigNumber]>;
 
+    vestingDate(arg0: string, overrides?: CallOverrides): Promise<[BigNumber]>;
+
     withdrawLeoTokens(
       _value: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -260,6 +268,8 @@ export interface LeoToken extends BaseContract {
 
   vestingBalance(overrides?: CallOverrides): Promise<BigNumber>;
 
+  vestingDate(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
+
   withdrawLeoTokens(
     _value: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
@@ -310,6 +320,8 @@ export interface LeoToken extends BaseContract {
     ): Promise<boolean>;
 
     vestingBalance(overrides?: CallOverrides): Promise<BigNumber>;
+
+    vestingDate(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
 
     withdrawLeoTokens(
       _value: BigNumberish,
@@ -389,6 +401,8 @@ export interface LeoToken extends BaseContract {
 
     vestingBalance(overrides?: CallOverrides): Promise<BigNumber>;
 
+    vestingDate(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
+
     withdrawLeoTokens(
       _value: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -445,6 +459,11 @@ export interface LeoToken extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     vestingBalance(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    vestingDate(
+      arg0: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
 
     withdrawLeoTokens(
       _value: BigNumberish,
