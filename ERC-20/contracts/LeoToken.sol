@@ -138,8 +138,7 @@ contract LeoToken {
     function _addVesting( address _customer, uint256 _amount, uint256 _date )
     private
     {
-        _date += releasePeriod;
-        vestingDate[ _customer ] = _date;
+        vestingDate[ _customer ] = _date + releasePeriod;
         vestingAmount[ _customer ] = _amount;
     }
 
